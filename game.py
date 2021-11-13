@@ -17,6 +17,14 @@ def print_grid():
 
 
 def main():
+    board_dim = input("Enter your board dimensions: ")
+    height, weight = board_dim.split()
+    weight = int(weight)
+    height = int(height)
+
+    # creating the array (better with class)
+
+
     pos = input("Enter the knight's starting position: ")
     try:
         # make -1 more precisely
