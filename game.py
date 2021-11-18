@@ -14,7 +14,7 @@ def print_grid(array, wdth, hght):
 
     border_length = wdth * (placeholder + 1) + 3
 
-    border = " " + "-" * border_length
+    border = " " + "-" * border_length  # finally correct border!
     #border = '-' * (wdth * 3 + 3)
 
     print(border)
@@ -23,19 +23,35 @@ def print_grid(array, wdth, hght):
         print(str(row_n) + "|", " ".join(i), "|")
         row_n -= 1
     print(border)
-    print(' ' * 4 + (placeholder * " ").join([str(n) for n in range(1, wdth + 1)]))
+    print(' ' * (placeholder + 2) + (placeholder * " ").join([str(n) for n in range(1, wdth + 1)]))
 
 
 def main():
-    def create_grid():
-        # write validation rules here
-        board_dim = input("Enter your board dimensions: ")
-        width, height = board_dim.split()
-        return int(width), int(height)
+    # def create_grid():
+    # write validation rules here
+    board_dim = input("Enter your board dimensions: ")
+    try:
+        # try list comprehension maybe?
+        width, height = [int(x) for x in board_dim.split()]
+
+        if any([width < 0, height < 0]):
+        # or just raise a ValueError?
+            print("Invalid position!")
+            return main()
+
+    except ValueError:
+        print("Invalid position!")
+        return main()
+
+    # print(type(width))
+    # print(type(height))
+        # print("current width:", width, "current height: ", height)
+
+        # return width, height
 
         # create negative case.
+    # width, height = create_grid()
 
-    width, height = create_grid()
 
     # creating the array (better with class)
 
@@ -61,6 +77,7 @@ def main():
         except ValueError:
             print("Invalid position!")
             return visit_cell()
+
     visit_cell()
 
     print_grid(array, width, height)
