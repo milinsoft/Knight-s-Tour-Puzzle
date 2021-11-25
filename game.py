@@ -1,5 +1,5 @@
 # array = [[(x, y) for x in range(1, 9)] for y in range(8, 0, -1)]
-
+import numpy as np
 
 class Knight:
 
@@ -32,11 +32,7 @@ class Knight:
                 return self.set_starting_position()
             # -y as actual beginning of our array is on hte top and starts with 0, and if to start from the end (-1) there is no need subtract 1
             """ positions should be marked as _X or __X (instead of X_ or _X_),"""
-            self.current_pos = [-self.axis_y, self.axis_x - 1]
-
-            y, x = self.current_pos
-
-            self.grid[y][x] = (self.placeholder - 1) * " " + "X"  # something like ___ or __ to "  X"
+            self.grid[-self.axis_y][self.axis_x - 1] = (self.placeholder - 1) * " " + "X"  # something like ___ or __ to "  X"
         except ValueError:
             print("Invalid position!")
             return self.set_starting_position()
@@ -68,14 +64,49 @@ class Knight:
 
         # checking what moves are possible
 
-        potential_moves = [[self.current_pos[0] + 2, self.current_pos[1] + 1],
-                           [self.current_pos[0] + 2, self.current_pos[1] - 1]
+        # print("current X, Y: ", self.axis_x, self.axis_y)
+        def generate_moves():
+            # first number - for axis x and 2nd for asix y
+            """The knight moves in an L-shape, so
+            it has to move 2 squares horizontally and 1 square vertically,
+            or
+            2 squares vertically and 1 square horizontally."""
+
+            right_and_top = [2, 1]
+            right_and_bottom = [2, -1]
+
+            left_and_top = [-2,  1]
+            left_and_bottom = [-2, -1]
 
 
-                           ]
-        print("potential_moves are: ", potential_moves)
+            top_and_right = [1, 2]
+            top_and_left = [-1, 2]
+
+            bottom_and_right = [1, -2]
+            bottom_and_left = [-1, -2]
+
+            potential_moves = list(map(lambda x: [x[0] + self.axis_x, x[1] + self.axis_y], [top_and_right,
+                                                                                       top_and_left,
+                                                                                       bottom_and_right,
+                                                                                       bottom_and_left,
+                                                                                       right_and_top,
+                                                                                       right_and_bottom,
+                                                                                       left_and_top,
+                                                                                       left_and_bottom]))
+
+            potential_moves = [move for move in potential_moves if 0 < move[0] <= self.border_width and 0 < move[1] <= self.border_height]
+            # print("potential_moves are: ", potential_moves)
+            return potential_moves
+
+        moves = generate_moves()
+
         possible_moves = [] # describe all 8 here, and put filter or confition minding the borders
-
+        print()
+        for x, y in moves:
+            try:
+                self.temporary_grid[-y][x - 1] = (self.placeholder - 1) * " " + "O"  # something like ___ or __ to "  X"
+            except IndexError:
+                continue
 
         print("Here are the possible moves:")
         self.print_grid(temp=True)
