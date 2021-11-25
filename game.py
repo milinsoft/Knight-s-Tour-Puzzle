@@ -12,7 +12,14 @@ class Knight:
         self.axis_y = None
 
     def create_grid(self):
-        ...
+        try:
+            self.border_width, self.border_height = [int(x) for x in input("Enter your board dimensions: ").split() if int(x) >= 0]
+        except ValueError:
+            print("Invalid position!")
+            return self.create_grid()
+
+        self.placeholder = len(str(self.border_width * self.border_height))
+        self.grid = [["_" * self.placeholder for _ in range(self.border_width)] for _ in range(self.border_height)]
 
     def visit_cell(self):
         pos = input("Enter the knight's starting position: ")
@@ -27,7 +34,6 @@ class Knight:
         except ValueError:
             print("Invalid position!")
             return self.visit_cell()
-        return self.grid
 
     def print_grid(self):
         row_n = self.border_height
@@ -44,18 +50,9 @@ class Knight:
 
 def main():
     knight = Knight()
-    try:
-        knight.border_width, knight.border_height = [int(x) for x in input("Enter your board dimensions: ").split() if int(x) >= 0]
 
-    except ValueError:
-        print("Invalid position!")
-        return main()
-
-    knight.placeholder = len(str(knight.border_width * knight.border_height))
-    knight.grid = [["_" * knight.placeholder for _ in range(knight.border_width)] for _ in range(knight.border_height)]
-
+    knight.create_grid()
     knight.visit_cell()
-
     knight.print_grid()
 
 
