@@ -12,7 +12,6 @@ class Knight:
         self.temporary_grid = None
         self.current_pos = None
 
-
     def visit_cell(self, x=None, y=None, marker="X", temp=False):
         if not temp:
             grid = self.grid
@@ -20,10 +19,9 @@ class Knight:
             x = self.axis_x
         else:
             grid = self.temporary_grid
-            marker = "O"
+            # marker = "O"
 
         grid[-y][x - 1] = (self.placeholder - 1) * " " + marker  # something like ___ or __ to "  X"
-
 
     def create_grid(self):
         try:
@@ -77,44 +75,35 @@ class Knight:
         # checking what moves are possible
         # print("current X, Y: ", self.axis_x, self.axis_y)
 
-        def generate_moves():
+        def generate_moves(current_pos=(self.axis_x, self.axis_y)):
+            x, y = current_pos
             # first number - for axis x and 2nd for asix y
             """The knight moves in an L-shape, so
             it has to move 2 squares horizontally and 1 square vertically,
             or
             2 squares vertically and 1 square horizontally."""
 
-            all_potential_moves = ((2, 1), (2, -1), (-2,  1), (-2, -1), (1, 2),(-1, 2), (1, -2), (-1, -2))
+            all_potential_moves = ((2, 1), (2, -1), (-2,  1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2))
 
-            potential_moves = list(map(lambda array: [array[0] + self.axis_x, array[1] + self.axis_y], all_potential_moves))
-
-            def possible_moves_number():
-                pass
-
+            potential_moves = map(lambda array: (array[0] + x, array[1] + y), all_potential_moves)  # generator
 
             potential_moves = [move for move in potential_moves if 0 < move[0] <= self.border_width and 0 < move[1] <= self.border_height]
-
-            final_dict = dict()
-
-            for move in potential_moves:
-                ...
-
-
             return potential_moves
 
         moves = generate_moves()
 
+        final_tuple = tuple(((x[0], x[1], len(generate_moves(x))) for x in moves))
 
-            
-        
+        test = tuple(generate_moves(x) for x in moves)
+        print(final_tuple)
+        print(test, sep="\n")
 
-        for x, y in moves:
-            self.visit_cell(y=y, x=x, temp=True)
+        # think about just creating the loop of 3 values, cordinates x, y and v - value of possible steps from that point
+        # or calculate value during filling the grid
 
-
-
-
-
+        for move in final_tuple:
+            # WHYYYY -1 ?
+            self.visit_cell(x=move[0], y=move[1], marker=str(move[2]-1), temp=True)  # in latter stage filter if cell != '*' will be needed
 
         print("Here are the possible moves:")
         self.print_grid(temp=True)
