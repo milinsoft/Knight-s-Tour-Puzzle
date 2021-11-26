@@ -14,12 +14,9 @@ class Knight:
 
     def visit_cell(self, x=None, y=None, marker="X", temp=False):
         if not temp:
-            grid = self.grid
-            y = self.axis_y
-            x = self.axis_x
+            grid, x, y,  = self.grid, self.axis_x, self.axis_y
         else:
             grid = self.temporary_grid
-            # marker = "O"
 
         grid[-y][x - 1] = (self.placeholder - 1) * " " + marker  # something like ___ or __ to "  X"
 
@@ -87,23 +84,18 @@ class Knight:
 
             potential_moves = map(lambda array: (array[0] + x, array[1] + y), all_potential_moves)  # generator
 
-            potential_moves = [move for move in potential_moves if 0 < move[0] <= self.border_width and 0 < move[1] <= self.border_height]
+            # SETTING ADDITIONAL FILTERS TO MAKE SURE THAT ORIGINAL POINT IS NOT INCLUDED.
+            potential_moves = [_move for _move in potential_moves if 0 < _move[0] <= self.border_width and 0 < _move[1] <= self.border_height and (_move[0], _move[1]) != (self.axis_x, self.axis_y)]
             return potential_moves
 
         moves = generate_moves()
 
         final_tuple = tuple(((x[0], x[1], len(generate_moves(x))) for x in moves))
 
-        test = tuple(generate_moves(x) for x in moves)
-        print(final_tuple)
-        print(test, sep="\n")
-
-        # think about just creating the loop of 3 values, cordinates x, y and v - value of possible steps from that point
-        # or calculate value during filling the grid
-
         for move in final_tuple:
-            # WHYYYY -1 ?
-            self.visit_cell(x=move[0], y=move[1], marker=str(move[2]-1), temp=True)  # in latter stage filter if cell != '*' will be needed
+            # __FIXED__ "marker=str(move[2] - 1)" Minus one because each list includes so=called " step back to original place,
+
+            self.visit_cell(x=move[0], y=move[1], marker=str(move[2]), temp=True)  # in latter stage filter if cell != '*' will be needed
 
         print("Here are the possible moves:")
         self.print_grid(temp=True)
