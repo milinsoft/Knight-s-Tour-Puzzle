@@ -12,6 +12,19 @@ class Knight:
         self.temporary_grid = None
         self.current_pos = None
 
+
+    def visit_cell(self, x=None, y=None, marker="X", temp=False):
+        if not temp:
+            grid = self.grid
+            y = self.axis_y
+            x = self.axis_x
+        else:
+            grid = self.temporary_grid
+            marker = "O"
+
+        grid[-y][x - 1] = (self.placeholder - 1) * " " + marker  # something like ___ or __ to "  X"
+
+
     def create_grid(self):
         try:
             self.border_width, self.border_height = [int(x) for x in input("Enter your board dimensions: ").split() if int(x) >= 0]
@@ -31,7 +44,9 @@ class Knight:
                 return self.set_starting_position()
             # -y as actual beginning of our array is on hte top and starts with 0, and if to start from the end (-1) there is no need subtract 1
             """ positions should be marked as _X or __X (instead of X_ or _X_),"""
-            self.grid[-self.axis_y][self.axis_x - 1] = (self.placeholder - 1) * " " + "X"  # something like ___ or __ to "  X"
+
+            self.visit_cell()
+
         except ValueError:
             print("Invalid position!")
             return self.set_starting_position()
@@ -69,38 +84,37 @@ class Knight:
             or
             2 squares vertically and 1 square horizontally."""
 
-            right_and_top = [2, 1]
-            right_and_bottom = [2, -1]
+            all_potential_moves = ((2, 1), (2, -1), (-2,  1), (-2, -1), (1, 2),(-1, 2), (1, -2), (-1, -2))
 
-            left_and_top = [-2,  1]
-            left_and_bottom = [-2, -1]
+            potential_moves = list(map(lambda array: [array[0] + self.axis_x, array[1] + self.axis_y], all_potential_moves))
 
-            top_and_right = [1, 2]
-            top_and_left = [-1, 2]
+            def possible_moves_number():
+                pass
 
-            bottom_and_right = [1, -2]
-            bottom_and_left = [-1, -2]
-
-            potential_moves = list(map(lambda array: [array[0] + self.axis_x, array[1] + self.axis_y], [top_and_right,
-                                                                                                        top_and_left,
-                                                                                                        bottom_and_right,
-                                                                                                        bottom_and_left,
-                                                                                                        right_and_top,
-                                                                                                        right_and_bottom,
-                                                                                                        left_and_top,
-                                                                                                        left_and_bottom]))
 
             potential_moves = [move for move in potential_moves if 0 < move[0] <= self.border_width and 0 < move[1] <= self.border_height]
-            # print("potential_moves are: ", potential_moves)
+
+            final_dict = dict()
+
+            for move in potential_moves:
+                ...
+
+
             return potential_moves
 
         moves = generate_moves()
 
+
+            
+        
+
         for x, y in moves:
-            try:
-                self.temporary_grid[-y][x - 1] = (self.placeholder - 1) * " " + "O"  # something like ___ or __ to "  X"
-            except IndexError:
-                continue
+            self.visit_cell(y=y, x=x, temp=True)
+
+
+
+
+
 
         print("Here are the possible moves:")
         self.print_grid(temp=True)
@@ -118,9 +132,3 @@ def main():
 if __name__ == '__main__':
     main()
 #  Note that the board is guaranteed to have a solution if the smallest dimension is at least 5. Smaller boards may not have a solution.
-
-""" for those who's code 100000000% right, and you still received and error like " Wrong answer in test #1
-Incorrect border or spacing. " 
-
-Do not print grid 2 times, 1 with original position and 1 with moves, PRINT JUST ONE GOD DAMN GRID with moves.
-"""
