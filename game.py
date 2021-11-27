@@ -24,15 +24,13 @@ class Knight:
         self.grid = [["_" * self.placeholder for _ in range(self.border_width)] for _ in range(self.border_height)]
 
     def set_starting_position(self):
-        pos = input("Enter the knight's starting position: ")
         try:
-            self.axis_x, self.axis_y = [int(x) for x in pos.split()]
+            self.axis_x, self.axis_y = [int(x) for x in input("Enter the knight's starting position: ").split()]
             if not all([0 < self.axis_y < self.border_height + 1, 0 < self.axis_x < self.border_width + 1]):
                 print("Invalid position!")
                 return self.set_starting_position()
             # -y as actual beginning of our array is on hte top and starts with 0, and if to start from the end (-1) there is no need subtract 1
             """ positions should be marked as _X or __X (instead of X_ or _X_),"""
-
             self.visit_cell(self.axis_x, self.axis_y)
 
         except ValueError:
@@ -41,10 +39,8 @@ class Knight:
 
     def print_grid(self):
         row_n = self.border_height
-        border_length = self.border_width * (self.placeholder + 1) + 3
-        border = f' {"-" * border_length}'  # finally correct border!
+        border = f' {"-" * (self.border_width * (self.placeholder + 1) + 3)}'  # finally correct border!
         print(border)
-
         for i in range(0, row_n):
             # rethink this conception, adding spaces only if sise more than 9 x 9, ideally making separate rules for left and bottom borders as they are quite independent
             print(str(row_n) + "|", " ".join(self.grid[i]), "|")
@@ -78,12 +74,17 @@ class Knight:
         print("Here are the possible moves:")
         self.print_grid()
 
+    def make_move(self):
+        ...
+
+    """ create check two int function"""
+
 
 def main():
     knight = Knight()
     knight.create_grid()
     knight.set_starting_position()
-    knight.show_moves()
+    knight.show_moves()  # maybe re-name to "current board status"?
 
 
 if __name__ == '__main__':
