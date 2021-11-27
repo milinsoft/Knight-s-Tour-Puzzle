@@ -9,16 +9,9 @@ class Knight:
         self.grid = None
         self.axis_x = None
         self.axis_y = None
-        self.temporary_grid = None
-        self.current_pos = None
 
-    def visit_cell(self, x=None, y=None, marker="X", temp=False):
-        if not temp:
-            grid, x, y,  = self.grid, self.axis_x, self.axis_y
-        else:
-            grid = self.temporary_grid
-
-        grid[-y][x - 1] = (self.placeholder - 1) * " " + marker  # something like ___ or __ to "  X"
+    def visit_cell(self, x=None, y=None, marker="X"):
+        self.grid[-y][x - 1] = (self.placeholder - 1) * " " + marker  # something like ___ or __ to "  X"
 
     def create_grid(self):
         try:
@@ -40,14 +33,13 @@ class Knight:
             # -y as actual beginning of our array is on hte top and starts with 0, and if to start from the end (-1) there is no need subtract 1
             """ positions should be marked as _X or __X (instead of X_ or _X_),"""
 
-            self.visit_cell()
+            self.visit_cell(self.axis_x, self.axis_y)
 
         except ValueError:
             print("Invalid position!")
             return self.set_starting_position()
 
-    def print_grid(self, temp=False):
-        printable_grid = self.grid if not temp else self.temporary_grid
+    def print_grid(self):
         row_n = self.border_height
         border_length = self.border_width * (self.placeholder + 1) + 3
         border = f' {"-" * border_length}'  # finally correct border!
@@ -55,13 +47,12 @@ class Knight:
 
         for i in range(0, row_n):
             # rethink this conception, adding spaces only if sise more than 9 x 9, ideally making separate rules for left and bottom borders as they are quite independent
-            print(str(row_n) + "|", " ".join(printable_grid[i]), "|")
+            print(str(row_n) + "|", " ".join(self.grid[i]), "|")
             row_n -= 1
         print(border)
         print(f"{' ' * (self.placeholder + 2)}{(self.placeholder * ' ').join((str(n) for n in range(1, self.border_width + 1)))}", "\n")
 
     def show_moves(self):
-        self.temporary_grid = self.grid  # need to fix, as print function is hard coded for self.grid
         # checking what moves are possible
 
         def generate_moves(current_pos=(self.axis_x, self.axis_y)) -> tuple:
@@ -83,9 +74,9 @@ class Knight:
 
         for move in moves:
             # __FIXED__ "marker=str(move[2] - 1)" Minus one because each list includes so=called " step back to original place,
-            self.visit_cell(x=move[0], y=move[1], marker=str(len(generate_moves(move))), temp=True)  # in latter stage filter if cell != '*' will be needed
+            self.visit_cell(x=move[0], y=move[1], marker=str(len(generate_moves(move))))  # in latter stage filter if cell != '*' will be needed
         print("Here are the possible moves:")
-        self.print_grid(temp=True)
+        self.print_grid()
 
 
 def main():
