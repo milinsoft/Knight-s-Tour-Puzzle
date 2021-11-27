@@ -63,11 +63,10 @@ class Knight:
             print(str(row_n) + "|", " ".join(i), "|")
             row_n -= 1
         print(border)
-        print(' ' * (self.placeholder + 2) + (self.placeholder * " ").join([str(n) for n in range(1, self.border_width + 1)]))
+        print(' ' * (self.placeholder + 2) + (self.placeholder * " ").join((str(n) for n in range(1, self.border_width + 1))))
         print()
 
     def show_moves(self):
-        # think about copy object, so not to reset marks each time
         self.temporary_grid = self.grid  # need to fix, as print function is hard coded for self.grid
         # checking what moves are possible
         # print("current X, Y: ", self.axis_x, self.axis_y)
@@ -85,7 +84,7 @@ class Knight:
             potential_moves = map(lambda array: (array[0] + x, array[1] + y), all_potential_moves)  # generator
 
             # SETTING ADDITIONAL FILTERS TO MAKE SURE THAT ORIGINAL POINT IS NOT INCLUDED.
-            potential_moves = [_move for _move in potential_moves if 0 < _move[0] <= self.border_width and 0 < _move[1] <= self.border_height and (_move[0], _move[1]) != (self.axis_x, self.axis_y)]
+            potential_moves = tuple(_move for _move in potential_moves if 0 < _move[0] <= self.border_width and 0 < _move[1] <= self.border_height and (_move[0], _move[1]) != (self.axis_x, self.axis_y))
             return potential_moves
 
         moves = generate_moves()
