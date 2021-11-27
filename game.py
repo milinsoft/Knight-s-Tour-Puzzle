@@ -47,33 +47,25 @@ class Knight:
             return self.set_starting_position()
 
     def print_grid(self, temp=False):
-
-        if not temp:
-            printable_grid = self.grid
-        else:
-            printable_grid = self.temporary_grid
-
+        printable_grid = self.grid if not temp else self.temporary_grid
         row_n = self.border_height
         border_length = self.border_width * (self.placeholder + 1) + 3
-        border = " " + "-" * border_length  # finally correct border!
+        border = f' {"-" * border_length}'  # finally correct border!
         print(border)
 
-        for i in printable_grid:
+        for i in range(0, row_n):
             # rethink this conception, adding spaces only if sise more than 9 x 9, ideally making separate rules for left and bottom borders as they are quite independent
-            print(str(row_n) + "|", " ".join(i), "|")
+            print(str(row_n) + "|", " ".join(printable_grid[i]), "|")
             row_n -= 1
         print(border)
-        print(' ' * (self.placeholder + 2) + (self.placeholder * " ").join((str(n) for n in range(1, self.border_width + 1))))
-        print()
+        print(f"{' ' * (self.placeholder + 2)}{(self.placeholder * ' ').join((str(n) for n in range(1, self.border_width + 1)))}", "\n")
 
     def show_moves(self):
         self.temporary_grid = self.grid  # need to fix, as print function is hard coded for self.grid
         # checking what moves are possible
-        # print("current X, Y: ", self.axis_x, self.axis_y)
 
-        def generate_moves(current_pos=(self.axis_x, self.axis_y)):
-            x, y = current_pos
-            # first number - for axis x and 2nd for asix y
+        def generate_moves(current_pos=(self.axis_x, self.axis_y)) -> tuple:
+            x, y = current_pos  # first number - for axis x and 2nd for asix y
             """The knight moves in an L-shape, so
             it has to move 2 squares horizontally and 1 square vertically,
             or
@@ -89,23 +81,17 @@ class Knight:
 
         moves = generate_moves()
 
-        final_tuple = tuple(((x[0], x[1], len(generate_moves(x))) for x in moves))
-
-        for move in final_tuple:
+        for move in moves:
             # __FIXED__ "marker=str(move[2] - 1)" Minus one because each list includes so=called " step back to original place,
-
-            self.visit_cell(x=move[0], y=move[1], marker=str(move[2]), temp=True)  # in latter stage filter if cell != '*' will be needed
-
+            self.visit_cell(x=move[0], y=move[1], marker=str(len(generate_moves(move))), temp=True)  # in latter stage filter if cell != '*' will be needed
         print("Here are the possible moves:")
         self.print_grid(temp=True)
 
 
 def main():
     knight = Knight()
-
     knight.create_grid()
     knight.set_starting_position()
-    # knight.print_grid()
     knight.show_moves()
 
 
