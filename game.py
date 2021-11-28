@@ -1,7 +1,3 @@
-# array = [[(x, y) for x in range(1, 9)] for y in range(8, 0, -1)]
-
-import re
-
 
 class Knight:
 
@@ -104,12 +100,7 @@ def main():
         knight.print_grid()
 
     empty_cells = tuple(cell for row in knight.grid for cell in row if cell[-1] == "_")
-
-    if not empty_cells:
-        print("What a great tour! Congratulations!")
-    else:
-        visited_cells = [cell for row in knight.grid for cell in row if cell[-1] in {"*", "X"}]  # or just +1 ?
-        print(f"No more possible moves!\nYour knight visited {len(visited_cells)} squares!")
+    print("What a great tour! Congratulations!" if not empty_cells else f"No more possible moves!\nYour knight visited {len(tuple(cell for row in knight.grid for cell in row if cell[-1] in {'*', 'X'}))} squares!")
 
 
 if __name__ == '__main__':
