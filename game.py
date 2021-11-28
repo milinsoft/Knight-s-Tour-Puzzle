@@ -43,8 +43,6 @@ class Knight:
             return self.set_starting_position()
 
     def print_grid(self):
-        print("CURRENT AXES :", self.axis_x, self.axis_y)
-
         row_n = self.border_height
         border = f' {"-" * (self.border_width * (self.placeholder + 1) + 3)}'  # finally correct border!
         print(border)
@@ -56,10 +54,7 @@ class Knight:
         print(f"{' ' * (self.placeholder + 2)}{(self.placeholder * ' ').join((str(n) for n in range(1, self.border_width + 1)))}", "\n")
 
     def show_moves(self):  # rename like "generate_moves" ? as this function is no longer print anything
-        # checking what moves are possible
 
-        # think about moving this function into oughter level,
-        # I need to pass make sure that current X is not calculated as a possible step.
         def generate_moves(current_pos=(self.axis_x, self.axis_y)) -> tuple:
             x, y = current_pos  # first number - for axis x and 2nd for asix y
             """The knight moves in an L-shape, so
@@ -72,21 +67,13 @@ class Knight:
             potential_moves = map(lambda array: (array[0] + x, array[1] + y), all_potential_moves)  # generator
 
             # SETTING ADDITIONAL FILTERS TO MAKE SURE THAT ORIGINAL POINT IS NOT INCLUDED.
-            potential_moves = tuple(_move for _move in potential_moves if all([0 < _move[0] <= self.border_width and 0 < _move[1] <= self.border_height,
-                                                                               (_move[0], _move[1]) != (x, y),
-                                                                               # _move[0] != self.axis_x and _move[1] != self.axis_y,
-                                                                               _move[0] != self.temp_x and _move[1] != self.temp_y,
-                                                                               (_move[0], _move[1]) != (self.axis_x, self.axis_y)]))
-
-            # if temp and current coordinates are filtered out - then no moves possible.
+            potential_moves = tuple(_move for _move in potential_moves if 0 < _move[0] <= self.border_width and 0 < _move[1] <= self.border_height and (_move[0], _move[1]) != (x, y) and self.grid[-_move[1]][_move[0]-1][-1] != "*" and (_move[0], _move[1]) != (self.axis_x, self.axis_y) and (_move[0], _move[1]) != (self.temp_x, self.temp_y))
             return potential_moves
 
         self.possible_moves = generate_moves()
 
-
         # maybe implement temp position here and add filter into the next line?
-        #self.possible_moves = tuple([x for x in self.possible_moves if len(generate_moves(x)) >= 0])  # change to > if not working but should be >=
-        print("TEST PRINT OF POSSIBLE MOVES: ", self.possible_moves)
+        self.possible_moves = tuple([x for x in self.possible_moves if len(generate_moves(x)) >= 0])
 
         # need to filter current position.
 
@@ -94,7 +81,6 @@ class Knight:
             # __FIXED__ "marker=str(move[2] - 1)" Minus one because each list includes so=called " step back to original place,
             self.visit_cell(x=move[0], y=move[1], marker=str(len(generate_moves(move))))  # in latter stage filter if cell != '*' will be needed
         # print("Here are the possible moves:")
-
 
     def make_move(self, message="Enter your next move: "):
 
@@ -111,27 +97,17 @@ class Knight:
         except (IndexError, ValueError):
             return self.make_move(message="Invalid move! Enter your next move: ")
 
+        self.temp_x, self.temp_y = self.axis_x, self.axis_y  # setting position before move to temp variables
 
-        self.axis_x, self.axis_y = _x, _y
+        self.visit_cell(self.axis_x, self.axis_y, marker="*")  # marking current position with asterisk
 
+        self.axis_x, self.axis_y = _x, _y  # reassigning position to new values
 
-        self.visit_cell(self.axis_x, self.axis_y, marker="*")  # reassing current axis
+        self.visit_cell(self.axis_x, self.axis_y, marker="X")  # moving current position to _x, _y coordinates
 
-        self.temp_x, self.temp_y = self.axis_x, self.axis_y
-
-        self.visit_cell(self.axis_x, self.axis_y, marker="X")  # marking new position with asterisk
-
-        " NEED TO MAKE SURE THAT CURRENT POSITION IS MADE * BEFORE REASSIGNING"
-
-        self.print_grid()
-
-
-        self.remove_old_marks()
+        self.remove_old_marks()  # removing old digits from the grid
         # set new marks with self.show_moves()
         self.show_moves()
-
-        #self.axis_x = self.temp_x
-        #self.axis_y = self.temp_y
 
 
     """ create check two int function"""
@@ -139,8 +115,14 @@ class Knight:
     def remove_old_marks(self):
         for row in range(self.border_height):
             for element in range(len(self.grid[row])):
+                #print(f'"{self.grid[row][element]}"')
+                # self.grid[row][element][-1] = re.sub(r"\d", "_", self.grid[row][element][-1])
+                #self.grid[row][element] = self.grid[row][element].replace(self.grid[row][element][-1], "_")
                 if re.match(r"\A\d$", self.grid[row][element][-1]):
                     self.grid[row][element] = "_" * self.placeholder
+
+
+
 
 
 def main():
@@ -150,16 +132,24 @@ def main():
     knight.show_moves()  # maybe re-name to "current board status"?
     knight.print_grid()
 
+
+
+
+
     while knight.possible_moves:
         knight.make_move()
         knight.print_grid()
 
 
+    #print("sorry, no more steps availiable")
     empty_cells = [cell for row in knight.grid for cell in row if cell[-1] == "_"]
-    if empty_cells:
-        print(f"Your knight visited {len([cell for row in knight.grid for cell in row if cell == '*'])} squares!")
-    else:
+
+    if not empty_cells:
         print("What a great tour! Congratulations!")
+    else:
+        visited_cells = [cell for row in knight.grid for cell in row if cell[-1] in {"*", "X"}]  # or just +1 ?
+        print(f"No more possible moves!\nYour knight visited {len(visited_cells)} squares!")
+
 
 
 
