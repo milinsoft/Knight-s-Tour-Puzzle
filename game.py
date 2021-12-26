@@ -10,6 +10,9 @@ class Knight:
         self.axis_y = None
         self.possible_moves = None
 
+        self.x_moves = [2, 2, -2, -2, 1, -1, 1, -1]
+        self.y_moves = [1, -1, 1, -1, 2, 2, -2, -2]
+
     def visit_cell(self, x=None, y=None, marker="X"):  # this name is no longer make sense, maybe " set_mark or mark cell? "
         self.grid[-y][x - 1] = f'{(self.placeholder - 1) * " "}{str(marker)}'  # something like ___ or __ to "  X"
 
@@ -33,6 +36,13 @@ class Knight:
             print("Invalid position!")
             return self.set_starting_position()
 
+
+    def valid_move(self, _x, _y):
+        return all([0 < _x <= self.border_width and 0 < _y <= self.border_height
+                    and self.grid[-_y][_x-1][-1] not in {"*", "X"}])
+
+
+
     def print_grid(self):
         # self.border_height is the same is row number
         border = f' {"-" * (self.border_width * (self.placeholder + 1) + 3)}'  # finally correct border!
@@ -43,27 +53,18 @@ class Knight:
         print(f"{border}\n"
               f"{' ' * (self.placeholder + 2)}{(self.placeholder * ' ').join((str(n) for n in range(1, self.border_width + 1)))}", "\n")
 
-    def generate_moves(self):  # rename like "generate_moves" ? as this function is no longer print anything
+    def generate_moves(self, x, y):  # rename like "generate_moves" ? as this function is no longer print anything
+        _step_values = [x for x in zip(self.x_moves, self.y_moves)]
 
-        def generate_moves(current_pos=(self.axis_x, self.axis_y)) -> tuple:
-            x, y = current_pos  # first number - for axis x and 2nd for asix y
-            """The knight moves in an L-shape, so
-            it has to move 2 squares horizontally and 1 square vertically,
-            or
-            2 squares vertically and 1 square horizontally."""
+        potential_moves = map(lambda array: (array[0] + x, array[1] + y), _step_values)  # generator of potential move coordinates
 
-            _step_values = ((2, 1), (2, -1), (-2,  1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2))
-            potential_moves = map(lambda array: (array[0] + x, array[1] + y), _step_values)  # generator of potential move coordinates
+        # It is crucial to use 'and' operator here to make sure that values are within borders
+        return tuple(_move for _move in potential_moves if self.valid_move(_move[0], _move[1]))
 
-            # It is crucial to use 'and' operator here to make sure that values are within borders
-            return tuple(_move for _move in potential_moves if all([0 < _move[0] <= self.border_width and 0 < _move[1] <= self.border_height
-                                                                    and self.grid[-_move[1]][_move[0]-1][-1] not in {"*", "X"}]
-                                                                   )
-                         )
 
-        self.possible_moves = generate_moves()
+    def show_board_status(self):
         for move in self.possible_moves:
-            self.visit_cell(x=move[0], y=move[1], marker=str(len(generate_moves(move))))
+            self.visit_cell(x=move[0], y=move[1], marker=str(len(self.generate_moves(move[0], move[1]))))
 
     def make_move(self, message="Enter your next move: "):
         try:
@@ -80,7 +81,8 @@ class Knight:
 
         self.remove_old_marks()  # removing old digits from the grid
         # set new marks with self.generate_moves()
-        self.generate_moves()
+        self.possible_moves = self.generate_moves(_x, _y)
+        self.show_board_status()
 
     def remove_old_marks(self):
         for move in self.possible_moves:
@@ -92,7 +94,8 @@ def main():
     knight = Knight()
     knight.create_grid()
     knight.set_starting_position()
-    knight.generate_moves()  # maybe re-name to "current board status"?
+    knight.possible_moves = knight.generate_moves(knight.axis_x, knight.axis_y)
+    knight.show_board_status()  # maybe re-name to "current board status"?
     knight.print_grid()
 
     while knight.possible_moves:
